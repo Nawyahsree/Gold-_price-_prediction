@@ -1,0 +1,39 @@
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.impute import SimpleImputer
+
+# Load the dataset
+data = pd.read_csv(r"C:\template\Gold (2).csv")
+
+# Exclude non-numeric columns for imputation
+numeric_columns = data.select_dtypes(include=[np.number]).columns.tolist()
+imputer = SimpleImputer(strategy='mean')
+data_imputed = pd.DataFrame(imputer.fit_transform(data[numeric_columns]), columns=numeric_columns)
+
+# Selecting features and target
+selected_features = ["Close/Last", "Volume", "Open"]
+X = data_imputed[selected_features]
+y = data_imputed[["High", "Low"]]
+
+# Initialize and train the linear regression model
+model = LinearRegression()
+model.fit(X, y)
+
+# User input for features
+close_last = float(input("Enter the Close/Last price: "))
+volume = float(input("Enter the volume: "))
+open_price = float(input("Enter the Open price: "))
+
+# Make prediction
+input_data = np.array([[close_last, volume, open_price]])
+predicted_prices = model.predict(input_data)
+
+# Determine if the predicted price is high or low
+predicted_high_price = predicted_prices[0][0]
+predicted_low_price = predicted_prices[0][1]
+
+if predicted_high_price > predicted_low_price:
+    print("The predicted gold price is High.")
+else:
+    print("The predicted gold price is Low.")
